@@ -84,4 +84,4 @@ def translate():
         return jsonify({'result': 'Translation failed.'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3001, ssl_context=('cert.pem', 'key.pem'))
+    app.run(host='0.0.0.0', port=3001)

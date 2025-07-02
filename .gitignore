@@ -1,5 +1,2 @@
 /.venv
 .env
-cert.pem
-key.pem
-*.pem
