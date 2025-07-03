@@ -41,7 +41,6 @@ def handle_translation_response(response, language):
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    image_file = request.files.get('image')
     language = request.form.get('language', 'English')
 
     prompt = (
@@ -61,14 +60,23 @@ def translate():
 
     contents = [prompt]
 
+    # Try to get image from form (multipart/form-data)
+    image_file = request.files.get('image')
     if image_file:
         try:
             img = Image.open(io.BytesIO(image_file.read()))
-            contents.append(img)
         except UnidentifiedImageError:
             return jsonify({'result': 'Invalid image file.'}), 400
+    # If not present, try to get raw data (application/octet-stream or image/jpeg)
+    elif request.data:
+        try:
+            img = Image.open(io.BytesIO(request.data))
+        except UnidentifiedImageError:
+            return jsonify({'result': 'Invalid image data.'}), 400
     else:
         return jsonify({'result': 'No image file provided.'}), 400
+
+    contents.append(img)
 
     try:
         response = client.models.generate_content(
